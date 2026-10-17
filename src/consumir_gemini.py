@@ -17,7 +17,7 @@ def armar_peticion(pregunta):
     body = {
         'contents':
             [{'parts': [{'text': pregunta}]}]
-      }
+        }
     return url, body
 
 #función envía la petición
@@ -28,6 +28,7 @@ def enviar_peticion(url, body):
         raise RuntimeError('No se pudo conectar con el servicio. Intenta de nuevos en unos minutos')
     except requests.exceptions.Timeout:
         raise RuntimeError('Se agotó el tiempo, intenta de nuevo en unos momentos.')
+    
     if respuesta.status_code != 200:
         raise RuntimeError(f'Error en la petición. Status Code: {respuesta.status_code}')
     
@@ -43,6 +44,7 @@ def extraer_texto(datos): #gemini
         return datos ['candidates'][0]['content']['parts'][0]['text']
     except(KeyError, IndexError): #error de llave o clave, se da cuando un diccionario no tiene un dato específico
         raise RuntimeError('La respuesta no recibe un texto generado en el lugar definido')
+    
 def obtener_dato_de_prueba(pregunta): #pregunta= 'Confirma la conexión'
     url, body = armar_peticion(pregunta) #obtiene url y body
     datos = enviar_peticion(url, body)
