@@ -48,7 +48,19 @@ def extraer_texto(datos): #gemini
 def obtener_dato_de_prueba(pregunta): #pregunta= 'Confirma la conexión'
     url, body = armar_peticion(pregunta) #obtiene url y body
     datos = enviar_peticion(url, body)
+    costo = calcular_costo(datos, 0.00000075, 0.00000375)
+    print(f'Costo de la petición: ${costo:.6f} USD')
     return extraer_texto(datos)
+
+def calcular_costo(datos, precio_entrada, precio_salida): #def calcular_costos(datos: dict, precio_entrada: float, precio_salida: float) -> float:
+    #datos = {dict... 'usageMetada'}
+    uso = datos['usageMetadata']
+    tokens_entrada = uso['promptTokenCount']
+    tokens_salida = uso['candidatesTokenCount']
+    tokens_razonamiento = uso['thoughtsTokenCount'] #revisar si existe o no, si no existe ingresar '0'
+    costo = (tokens_entrada * precio_entrada) + ((tokens_salida + tokens_razonamiento) * precio_salida)
+    return costo 
+    
 
 try:
     print(obtener_dato_de_prueba('Confirma en una frase corta que esta conexión funciona'))
