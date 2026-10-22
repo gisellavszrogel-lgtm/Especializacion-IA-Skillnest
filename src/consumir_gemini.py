@@ -3,6 +3,9 @@ import requests
 from dotenv import load_dotenv
 import time
 
+import json
+import re
+
 load_dotenv()
 
 #variables constantes
@@ -12,7 +15,7 @@ API_KEY = os.getenv('GEMINI_API_KEY')
 
 
 #función para crear la solicitud
-def armar_peticion(modelo, pregunta, system_instruction):
+def armar_peticion(modelo, pregunta, system_instruction, response_schema=None):
     if not pregunta:
         raise ValueError('La pregunta no puede estar vacía')
     url = f'{URL_BASE}{modelo}:generateContent?key={API_KEY}' #url = https://generativelanguage.googleapis.com/v1beta/models/{modelo}:generateContent?key=MI API KEY'
@@ -28,6 +31,11 @@ def armar_peticion(modelo, pregunta, system_instruction):
         'contents':
             [{'parts': [{'text': pregunta}]}]
         }
+    if response_schema is not None:
+            body['generationConfig'] = {
+                'responseMimeType': 'application/json',  # Con 'm' y con la coma al final
+                'responseSchema': response_schema
+            }
     return url, body
 
 #función envía la petición
@@ -55,12 +63,21 @@ def extraer_texto(datos): #gemini
         raise RuntimeError('La respuesta no recibe un texto generado en el lugar definido')
     
 def obtener_dato_de_prueba(pregunta): #pregunta= 'Confirma la conexión'
+
+    response_schema = {
+        'type': 'OBJECT',
+        'properties': {
+            'categoría': {'type': 'STRING'},
+            'nivel': {'type': 'NUMBER'}
+        },
+    }
+
     system_instruction = 'Eres un asistente amigable y responder en máximo 2 palabras'
     url, body = armar_peticion(MODELO, pregunta, system_instruction) #obtiene url y body
     
     inicio = time.perf_counter() #empezar el contador
 
-    datos = enviar_peticion(url, body)
+    datos = enviar_peticion(url, body) 
 
     fin = time.perf_counter() #termina el contador
     latencia = fin - inicio
@@ -78,6 +95,22 @@ def calcular_costo(datos, precio_entrada, precio_salida): #def calcular_costos(d
     tokens_razonamiento = uso.get('thoughtsTokenCount', 0) #revisar si existe o no, si no existe ingresar '0'
     costo = (tokens_entrada * precio_entrada) + ((tokens_salida + tokens_razonamiento) * precio_salida)
     return costo 
+
+def parsear_respuesta_jason(texto, claves_requeridas=None):
+    texto_limpio = texto.strip()
+    texto_limpio = re.sub(r"^```(?:json)?\s*", "", texto_limpio)
+    texto_limpio = re.sub(r"\s*```$", "", texto_limpio)
+
+    try:
+        datos = json.loads(texto_limpio)
+    except json.JSONDecodeError:
+        raise ValueError("La respuesta del modelo no es JSON válido")
+    
+    if claves_requeridas:
+        faltantes = [clave for clave in claves_requeridas if clave not in datos]
+        if faltantes:
+            raise ValueError("La respuesta no tiene la estructura esperada.")
+    return datos
     
 # try:
 #     print(obtener_dato_de_prueba('Hola Eva, neceito que me ayudes a registrar una factura'))
