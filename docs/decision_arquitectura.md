@@ -4,6 +4,7 @@
 
 **gemini-3.6-flash**, para la funcionalidad principal de la miniaplicación (procesamiento y normalización de inventario CSV para Shopify Admin API).
 
+### Justificación
 Bajo el marco del triángulo de IA (**Costo, Latencia y Calidad**), donde es necesario priorizar dos aristas en función de la viabilidad técnica del producto, se optó por **Latencia** y **Calidad**:
 
 * **Latencia (Prioridad 1):** Con un promedio de **7,12 segundos** (y registros de hasta 3,50 segundos), demostró ser casi 3 veces más veloz que las alternativas Lite y Flash 3.8 (~19 s - 20 s). En un flujo de sincronización de inventario masivo hacia Shopify, reducir la latencia por fila evita la acumulación de colas y los bloqueos por límite de tiempo de conexión (timeouts).
@@ -28,7 +29,7 @@ El flujo completo va desde la entrada de datos de la fila del archivo CSV hasta 
 | Tasa de éxito en benchmark | 75% (3/4 exitosos, 1 fallo 503) | 75% (3/4 exitosos, 1 fallo 503) | 25% (1/4 exitosos, 3 fallos 503) |
 | Fecha de medición | 2026-10-22 | 2026-10-22 | 2026-10-22 |
 
-## Justificación
+### Justificación
 
 Para esta miniaplicación de procesamiento de inventario a partir de archivos CSV, la velocidad y la estabilidad fueron los factores determinantes. `gemini-3.6-flash` registró una latencia promedio de 7,12 segundos (con picos óptimos de 3,50 segundos), lo que representa casi un tercio del tiempo observado en `gemini-3.5-flash-lite` (19,07 s) y `gemini-3.8-flash` (20,78 s). Al procesar lotes de filas de productos para actualizar catálogos en Shopify, una latencia reducida previene bloqueos por tiempo de espera en el cliente y garantiza una ejecución fluida. Asimismo, entregó un formato JSON minificado y limpio listo para consumir por la API sin necesidad de etapas adicionales de formateo.
 
