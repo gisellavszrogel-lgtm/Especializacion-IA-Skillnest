@@ -1,19 +1,3 @@
-BANCO_DE_PROMPT = [
-    {
-        "nombre": "X",
-        "system_instruction": "Y",
-        "ejemplo_usuario": "Z",
-        "claves_esperadas": ["clave1", "clave2"],
-        "response_schema": {
-            "type": "OBJECT",
-            "properties": {
-                "categoria": {"type": "STRING"},
-                "nivel": {"type": "NUMBER"}
-            },
-            "required": ["clave1", "clave2"]
-        }
-    }
-]
 
 BANCO_DE_PROMPTS = [
     {
@@ -97,5 +81,28 @@ BANCO_DE_PROMPTS = [
             },
             "required": ["tags", "handle", "meta_description"]
         }
-    }
+    },
+    {
+    "nombre": "extraer_fila_csv_shopify",
+    "system_instruction": (
+        "Eres un procesador de datos para e-commerce. Tu tarea es recibir una fila o texto "
+        "desordenado de un producto o inventario de proveedor y estructurarlo exactamente en los campos "
+        "requeridos para crear el producto en Shopify. Si falta el SKU, genera uno coherente en mayúsculas."
+    ),
+    "ejemplo_usuario": (
+        "Polerón canguro franela gris talla L, 25 unidades en bodega central, costo unitario 19990. Marca Kerna."
+    ),
+    "claves_esperadas": ["title", "sku", "price", "quantity", "vendor"],
+    "response_schema": {
+        "type": "OBJECT",
+        "properties": {
+            "title": {"type": "STRING"},
+            "sku": {"type": "STRING"},
+            "price": {"type": "NUMBER"},
+            "quantity": {"type": "INTEGER"},
+            "vendor": {"type": "STRING"},
+        },
+        "required": ["title", "sku", "price", "quantity", "vendor"],
+    },
+}
 ]
