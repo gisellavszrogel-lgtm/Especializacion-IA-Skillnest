@@ -63,7 +63,7 @@ def evaluar_modelo(nombre_modelo, pregunta, system_instruction, precio_entrada, 
 # ==============================================================================
 # CONFIGURACIÓN GENERAL Y MODELOS A EVALUAR
 # ==============================================================================
-pregunta_prueba = ("Por favor emitir factura al cliente Comercial Austral Limitada," "RUT 77.890.123-4 por un total de 245000 pesos asociado a la orden Shopify #8921.")
+pregunta_prueba = ("Procesa la siguiente fila de CSV: ""'Prod: Chaleco Lana Merino Talla M; Cod_Interno: MER-CHAL-M; Bodega_Central: LOC_0987; Conteo_Fisico: 18 uds'")
 instruccion_sistema = ("Eres Eva, asistente técnica de Kerna. Extrae los datos para facturación electrónica " "y responde exclusivamente en formato JSON con las claves: " "rut, razon_social, monto_total, tipo_documento. Sin formato Markdown ni comentarios.")
 
 

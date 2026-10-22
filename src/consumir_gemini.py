@@ -19,9 +19,10 @@ def armar_peticion(modelo, pregunta, system_instruction):
     body = {
         'systemInstruction':{
             'parts': [ 
-                {'text': "Eres Eva, asistente técnica de Kerna. Extrae los datos para facturación electrónica "
-                        "y responde exclusivamente en formato JSON con las claves: "
-                         "rut, razon_social, monto_total, tipo_documento. Sin formato Markdown ni comentarios."}
+                {'text': "Eres el procesador de inventario de Kerna. Tu tarea es recibir datos desordenados "
+                        "de una fila de CSV de un proveedor y extraer un objeto JSON válido para la API de Shopify "
+                        "con las claves obligatorias: sku, available_quantity, location_id y title. "
+                        "Responde exclusivamente en formato JSON sin formato Markdown ni explicaciones."}
             ]
         },
         'contents':
