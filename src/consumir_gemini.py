@@ -22,10 +22,7 @@ def armar_peticion(modelo, pregunta, system_instruction, response_schema=None):
     body = {
         'systemInstruction':{
             'parts': [ 
-                {'text': "Eres el procesador de inventario de Kerna. Tu tarea es recibir datos desordenados "
-                        "de una fila de CSV de un proveedor y extraer un objeto JSON válido para la API de Shopify "
-                        "con las claves obligatorias: sku, available_quantity, location_id y title. "
-                        "Responde exclusivamente en formato JSON sin formato Markdown ni explicaciones."}
+                {'text': system_instruction}
             ]
         },
         'contents':
@@ -41,7 +38,7 @@ def armar_peticion(modelo, pregunta, system_instruction, response_schema=None):
 #función envía la petición
 def enviar_peticion(url, body):
     try:
-        respuesta = requests.post(url, json=body, timeout=30)
+        respuesta = requests.post(url, json=body, timeout=60)
     except requests.exceptions.ConnectionError:
         raise RuntimeError('No se pudo conectar con el servicio. Intenta de nuevos en unos minutos')
     except requests.exceptions.Timeout:
@@ -67,25 +64,34 @@ def obtener_dato_de_prueba(pregunta): #pregunta= 'Confirma la conexión'
     response_schema = {
         'type': 'OBJECT',
         'properties': {
-            'categoría': {'type': 'STRING'},
-            'nivel': {'type': 'NUMBER'}
+            "title": {"type": "STRING"},
+            "sku": {"type": "STRING"},
+            "price": {"type": "NUMBER"},
+            "quantity": {"type": "INTEGER"},
+            "vendor": {"type": "STRING"},
         },
+        "required": ["title", "sku", "price", "quantity", "vendor"],
     }
 
-    system_instruction = 'Eres un asistente amigable y responder en máximo 2 palabras'
-    url, body = armar_peticion(MODELO, pregunta, system_instruction) #obtiene url y body
+    system_instruction = 'Eres un procesador de catálogo de e-commerce. Extrae la información'
+    "de la entrada respetando estrictamente el esquema JSON."
+    url, body = armar_peticion(MODELO, pregunta, system_instruction, response_schema) #obtiene url y body
     
     inicio = time.perf_counter() #empezar el contador
-
     datos = enviar_peticion(url, body) 
-
     fin = time.perf_counter() #termina el contador
+
     latencia = fin - inicio
     print(f'Latencia: {latencia:.2f} segundos')
 
     costo = calcular_costo(datos, 0.00000075, 0.00000375)
     print(f'Costo de la petición: ${costo:.6f} USD')
-    return extraer_texto(datos)
+
+    texto_crudo = extraer_texto(datos)
+    claves_a_revisar = ["title", "sku", "price", "quantity", "vendor"]
+    datos_limpios = parsear_respuesta_json(texto_crudo, claves_a_revisar)
+
+    return datos_limpios
 
 def calcular_costo(datos, precio_entrada, precio_salida): #def calcular_costos(datos: dict, precio_entrada: float, precio_salida: float) -> float:
     #datos = {dict... 'usageMetada'}
@@ -96,7 +102,7 @@ def calcular_costo(datos, precio_entrada, precio_salida): #def calcular_costos(d
     costo = (tokens_entrada * precio_entrada) + ((tokens_salida + tokens_razonamiento) * precio_salida)
     return costo 
 
-def parsear_respuesta_jason(texto, claves_requeridas=None):
+def parsear_respuesta_json(texto, claves_requeridas=None):
     texto_limpio = texto.strip()
     texto_limpio = re.sub(r"^```(?:json)?\s*", "", texto_limpio)
     texto_limpio = re.sub(r"\s*```$", "", texto_limpio)
@@ -111,8 +117,13 @@ def parsear_respuesta_jason(texto, claves_requeridas=None):
         if faltantes:
             raise ValueError("La respuesta no tiene la estructura esperada.")
     return datos
-    
-# try:
-#     print(obtener_dato_de_prueba('Hola Eva, neceito que me ayudes a registrar una factura'))
-# except(ValueError, RuntimeError) as error:
-#     print('No se pudo completar la operación: ', error)
+
+if __name__ == "__main__": 
+    try:
+        print(
+            obtener_dato_de_prueba(
+                "Hola Eva, necesito que me ayudes a registrar una factura"
+            )
+        )
+    except (ValueError, RuntimeError) as error:
+        print("No se pudo completar la operación: ", error)
