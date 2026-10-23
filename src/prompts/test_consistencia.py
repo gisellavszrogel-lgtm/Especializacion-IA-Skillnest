@@ -36,9 +36,7 @@ try:
         
 
     #Cuando termine de recorrer los prompts quiero guardar esa info en registro_resultados.json
-    ruta = os.path.join(
-    os.path.dirname(__file__), "prompts", "registro_resultados.json")
-    os.makedirs(os.path.dirname(ruta), exist_ok=True)
+    ruta = os.path.join(os.path.dirname(__file__), "registro_resultados.json")
     with open(ruta, "w", encoding="utf-8") as archivo: json.dump(registro, archivo, indent=2, ensure_ascii=False)
 
 
