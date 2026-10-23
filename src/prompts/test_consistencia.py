@@ -1,7 +1,11 @@
 import json
 import os
+import sys
 import time
-from prompts.banco import BANCO_DE_PROMPT
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+from banco import BANCO_DE_PROMPT
 from consumir_gemini import armar_peticion, enviar_peticion, extraer_texto, parsear_respuesta_json
 
 registro = {}
@@ -13,7 +17,7 @@ try:
         intentos = 3
         for intento in range(intentos):
             url, body = armar_peticion(
-                "gemini-3.6-flash", 
+                "gemini-3.5-flash-lite", 
                 prompt["ejemplo_usuario"], 
                 prompt["system_instruction"], 
                 prompt["response_schema"]
