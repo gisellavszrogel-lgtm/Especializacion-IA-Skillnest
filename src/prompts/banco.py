@@ -1,5 +1,5 @@
 
-BANCO_DE_PROMPTS = [
+BANCO_DE_PROMPT = [
     {
         "nombre": "armar_ficha_shopify",
         "system_instruction": (
