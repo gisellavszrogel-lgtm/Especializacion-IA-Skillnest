@@ -73,6 +73,19 @@ python src/prompts/test_consistencia.py
 ```
 * **Salida esperada:** 12 casos evaluados exitosamente (12/12 válidas) y actualización del reporte en `src/prompts/registro_resultados.json`.
 
+
+
+---
+
+### Registro Operativo y Métricas de Estabilidad
+
+Durante las fases de prueba local y la corrida de consistencia sobre el banco de prompts, el sistema registró **cero incidencias operativas**:
+
+- **Tasa de éxito de peticiones:** 100% (12/12 evaluaciones válidas en la suite de consistencia).
+- **Adherencia al esquema JSON:** 100% de cumplimiento determinista del contrato de datos.
+- **Incidencias por cuota o timeout:** 0 caídas (latencia promedio observada: ~2.19 s por llamada).
+
+
 ---
 
 ### Estructura del Repositorio
