@@ -1,6 +1,5 @@
-# Proyecto gradual de Gisella Velásquez Rogel - Especialización en Desarrollo con IA Generativa
-
-## Integración Backend con Inteligencia Artificial - Gate 1
+# Integración Backend con Inteligencia Artificial - Gate 1
+### Por Gisella Velásquez Rogel
 
 Pipeline en Python para la ingesta, normalización y extracción estructurada de catálogos de e-commerce mediante Google Gemini API (`gemini-3.6-flash`), aplicando validación determinista de esquemas JSON para su integración con Shopify Admin API.
 
