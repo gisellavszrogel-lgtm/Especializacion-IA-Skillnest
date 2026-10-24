@@ -43,6 +43,14 @@ def enviar_peticion(url, body):
         raise RuntimeError('No se pudo conectar con el servicio. Intenta de nuevos en unos minutos')
     except requests.exceptions.Timeout:
         raise RuntimeError('Se agotó el tiempo, intenta de nuevo en unos momentos.')
+
+    if respuesta.status_code in(401, 403):
+        raise ValueError('Crendencial inválida o sin permiso. Revisa tu GEMINI_API_KEY')
+    if respuesta.status_code >= 500:
+        raise TimeoutError('El proveedor no pudo procesar la petición. Hay que esperar y reintentar')
+    if respuesta.status_code == 429:
+        raise RuntimeError('Límite excedido. Vuelva a intentarlo más tarde')
+    
     
     if respuesta.status_code != 200:
         raise RuntimeError(f'Error en la petición. Status Code: {respuesta.status_code}')
@@ -125,5 +133,5 @@ if __name__ == "__main__":
                 "Hola Eva, necesito que me ayudes a registrar una factura"
             )
         )
-    except (ValueError, RuntimeError) as error:
+    except (ValueError, RuntimeError, TimeoutError) as error:
         print("No se pudo completar la operación: ", error)
