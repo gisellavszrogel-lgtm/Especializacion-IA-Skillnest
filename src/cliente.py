@@ -1,11 +1,16 @@
-import time
+from pathlib import Path
+import sys
+
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+
+from typing import Any, Callable
 import random
+import time
 import requests
-from typing import Callable, Any
 
-from src.consumir_gemini import armar_peticion, extraer_texto, enviar_peticion
+from src.consumir_gemini import armar_peticion, enviar_peticion, extraer_texto
 
-MODELO = "gemini-3.6-flash"
+MODELO = "gemini-3.5-flash-lite"
 
 def con_reintento(
     funcion: Callable[[], Any], 
