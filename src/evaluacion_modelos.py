@@ -1,5 +1,11 @@
+from pathlib import Path
+import sys
+
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+
 import time
-import consumir_gemini
+from src import consumir_gemini
+from src.cliente import con_reintento
 
 
 def evaluar_modelo(nombre_modelo, pregunta, system_instruction, precio_entrada, precio_salida, repeticiones=4):
@@ -25,7 +31,7 @@ def evaluar_modelo(nombre_modelo, pregunta, system_instruction, precio_entrada, 
         # 2. Captura de excepciones durante la conexión y el procesamiento
         try:
             inicio = time.perf_counter()
-            datos = consumir_gemini.enviar_peticion(url, body)
+            datos = con_reintento(lambda: consumir_gemini.enviar_peticion(url, body))
             fin = time.perf_counter()
 
             latencia = fin - inicio
