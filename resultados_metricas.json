@@ -1,23 +1,162 @@
 [
   {
-    "consulta": "¿Cuándo se creó Python?",
-    "respuesta": "Python fue creado oficialmente en el año mil novecientos noventa y uno.",
-    "precision": 0.3333333333333333,
-    "cobertura": 0.8,
-    "f1": 0.47058823529411764
+    "consulta": "¿Qué día viene el camión de las bebidas CCU?",
+    "referencia": "El repartidor de CCU viene todos los martes por la mañana.",
+    "respuesta": "La frecuencia de entrega depende de la ruta y contrato específico con su distribuidor local.",
+    "precision": 0.13333333333333333,
+    "cobertura": 0.18181818181818182,
+    "f1": 0.15384615384615383
   },
   {
-    "consulta": "¿Qué es una lista en Python?",
-    "respuesta": "Es una colección ordenada y modificable de elementos que admite múltiples tipos de datos.",
+    "consulta": "¿Me queda suficiente azúcar para el fin de semana?",
+    "referencia": "Te quedan diez kilos de azúcar, cantidad suficiente para el fin de semana.",
+    "respuesta": "Como inteligencia artificial, carezco de acceso a tu despensa para conocer tus suministros.",
+    "precision": 0.15384615384615385,
+    "cobertura": 0.15384615384615385,
+    "f1": 0.15384615384615385
+  },
+  {
+    "consulta": "¿Cuántas bandejas de huevos debo pedir para no quedarme sin stock?",
+    "referencia": "Debes encargar tres bandejas de huevos para cubrir la semana.",
+    "respuesta": "La cantidad necesaria depende de su demanda promedio y el tiempo de reposición de inventario.",
+    "precision": 0.13333333333333333,
+    "cobertura": 0.2,
+    "f1": 0.16
+  },
+  {
+    "consulta": "¿Cuándo tengo que volver a comprar harina de kilo?",
+    "referencia": "Debes comprar harina cuando el stock baje de cinco paquetes.",
+    "respuesta": "Debes comprarla cuando se agote la reserva actual en tu despensa.",
+    "precision": 0.18181818181818182,
+    "cobertura": 0.2,
+    "f1": 0.1904761904761905
+  },
+  {
+    "consulta": "¿Qué hago con el papel de la guía de despacho que me firmó el chofer?",
+    "referencia": "Guarda el documento y registra el número de guía en la entrada de inventario.",
+    "respuesta": "Guárdalo cuidadosamente para respaldar la recepción conforme y gestionar la facturación de tu compra.",
+    "precision": 0.21428571428571427,
+    "cobertura": 0.21428571428571427,
+    "f1": 0.21428571428571427
+  },
+  {
+    "consulta": "¿Qué proveedor me entrega la harina y legumbres más barato?",
+    "referencia": "Mayorista Los Álamos ofrece el menor precio en harina y legumbres.",
+    "respuesta": "Los precios varían según la región, mercado mayorista y las ofertas vigentes de cada proveedor.",
+    "precision": 0.2,
+    "cobertura": 0.2727272727272727,
+    "f1": 0.23076923076923075
+  },
+  {
+    "consulta": "¿Qué mercadería está por debajo del stock de seguridad hoy?",
+    "referencia": "El arroz y la leche entera están bajo el mínimo configurado.",
+    "respuesta": "El stock de seguridad es el nivel mínimo de inventario necesario para evitar quiebres.",
+    "precision": 0.21428571428571427,
+    "cobertura": 0.2727272727272727,
+    "f1": 0.23999999999999996
+  },
+  {
+    "consulta": "¿Cuánto tiempo hace que no compramos cloro y lavalozas?",
+    "referencia": "Hace tres semanas que no registras compras de productos de aseo.",
+    "respuesta": "No cuento con información sobre tus compras personales o el inventario de tu hogar.",
+    "precision": 0.21428571428571427,
+    "cobertura": 0.2727272727272727,
+    "f1": 0.23999999999999996
+  },
+  {
+    "consulta": "¿Cuándo llega el pedido de fideos y conservas que encargué ayer?",
+    "referencia": "El pedido de fideos llegará mañana jueves antes del mediodía.",
+    "respuesta": "Consulta el estado de tu pedido directamente en el sitio web donde realizaste la compra.",
+    "precision": 0.2,
+    "cobertura": 0.3,
+    "f1": 0.24
+  },
+  {
+    "consulta": "¿Cómo ingreso al sistema diez sacos de papas que compré en la feria?",
+    "referencia": "Presiona Entrada de Mercadería, selecciona papas y escribe diez sacos.",
+    "respuesta": "Registra la compra en el sistema ingresando la cantidad y valor de las papas.",
+    "precision": 0.21428571428571427,
+    "cobertura": 0.3,
+    "f1": 0.25
+  },
+  {
+    "consulta": "¿Dónde anoto el precio nuevo si el proveedor me subió el aceite?",
+    "referencia": "Actualiza el costo en la ficha del producto antes de confirmar la recepción.",
+    "respuesta": "Registra el nuevo precio en tu sistema de inventario o en la lista de costos.",
+    "precision": 0.26666666666666666,
+    "cobertura": 0.3076923076923077,
+    "f1": 0.28571428571428575
+  },
+  {
+    "consulta": "¿Cuál es el stock mínimo que debo mantener de aceite de litro?",
+    "referencia": "El stock mínimo de aceite de litro es de seis botellas.",
+    "respuesta": "El stock mínimo es la cantidad necesaria para cubrir la demanda durante el tiempo entrega.",
+    "precision": 0.26666666666666666,
+    "cobertura": 0.36363636363636365,
+    "f1": 0.30769230769230765
+  },
+  {
+    "consulta": "¿En qué momento debo registrar la mercadería que me deja el camión?",
+    "referencia": "Debes registrar los productos apenas recibas y revises la factura del repartidor.",
+    "respuesta": "Debes registrar la mercadería inmediatamente tras recibirla, verificar su estado y validar la documentación.",
+    "precision": 0.2857142857142857,
+    "cobertura": 0.3333333333333333,
+    "f1": 0.30769230769230765
+  },
+  {
+    "consulta": "¿Quién es el proveedor que nos trae los lácteos Soprole?",
+    "referencia": "El proveedor de lácteos es Distribuidora del Sur, atendido por Don Marcos.",
+    "respuesta": "El proveedor que distribuye los lácteos Soprole es la empresa Soprole Inversiones S.A.",
+    "precision": 0.3076923076923077,
+    "cobertura": 0.3333333333333333,
+    "f1": 0.32
+  },
+  {
+    "consulta": "¿Cómo anoto una caja de leche que llegó rota y no puedo vender?",
+    "referencia": "Regístrala como merma o devolución presionando el botón de producto dañado.",
+    "respuesta": "Registra la unidad como merma o baja en el sistema de inventarios por avería.",
+    "precision": 0.35714285714285715,
+    "cobertura": 0.45454545454545453,
+    "f1": 0.4
+  },
+  {
+    "consulta": "¿A qué número llamo para pedir más pan corriente si se acaba?",
+    "referencia": "Llama a Panadería Central al número anotado en tu contacto de proveedores.",
+    "respuesta": "Debes consultar directamente a tu panadería local para obtener su número de contacto.",
+    "precision": 0.46153846153846156,
+    "cobertura": 0.5,
+    "f1": 0.48000000000000004
+  },
+  {
+    "consulta": "¿Cuándo fue la última fecha que le compramos al proveedor de galletas?",
+    "referencia": "La última compra de galletas se registró el martes pasado.",
+    "respuesta": "La última fecha de compra al proveedor de galletas fue el diez de octubre.",
     "precision": 0.42857142857142855,
-    "cobertura": 0.75,
-    "f1": 0.5454545454545454
+    "cobertura": 0.6,
+    "f1": 0.5
   },
   {
-    "consulta": "¿Qué es Python?",
-    "respuesta": "Python es un lenguaje de programación de alto nivel, interpretado y de propósito general.",
+    "consulta": "¿Debo registrar las compras antes o después de colocar los productos en el estante?",
+    "referencia": "Registra las compras antes de ordenar los productos en las estanterías.",
+    "respuesta": "Debes registrar las compras antes de colocar los productos en el estante de venta.",
     "precision": 0.5,
-    "cobertura": 1.0,
-    "f1": 0.6666666666666666
+    "cobertura": 0.6363636363636364,
+    "f1": 0.56
+  },
+  {
+    "consulta": "¿Cuál es el monto mínimo de compra que exige el proveedor de cecinas?",
+    "referencia": "El pedido mínimo de cecinas es de veinticinco mil pesos.",
+    "respuesta": "El monto mínimo de compra exigido por el proveedor es de cincuenta mil pesos.",
+    "precision": 0.5,
+    "cobertura": 0.7,
+    "f1": 0.5833333333333334
+  },
+  {
+    "consulta": "¿Para qué fecha está programada la entrega de las bebidas?",
+    "referencia": "La entrega de bebidas está agendada para este viernes temprano.",
+    "respuesta": "La entrega de las bebidas está programada para el próximo viernes quince de noviembre.",
+    "precision": 0.5,
+    "cobertura": 0.7,
+    "f1": 0.5833333333333334
   }
 ]

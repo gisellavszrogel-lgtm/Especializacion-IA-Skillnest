@@ -1,0 +1,126 @@
+import json
+
+revision_manual = [
+    # =========================================================================
+    # 5 CASOS CON F1 MÁS BAJO (Puntajes entre 0.15 y 0.21)
+    # =========================================================================
+    {
+        "consulta": "¿Qué día viene el camión de las bebidas CCU?",
+        "f1": 0.15,
+        "correccion_factual": "no",
+        "completitud": "no",
+        "contradiccion": "si",
+        "nota": (
+            "El modelo evadió la respuesta dando una explicación genérica sobre rutas "
+            "y contratos en lugar de indicar el día martes registrado en el negocio."
+        ),
+    },
+    {
+        "consulta": "¿Me queda suficiente azúcar para el fin de semana?",
+        "f1": 0.15,
+        "correccion_factual": "no",
+        "completitud": "no",
+        "contradiccion": "no",
+        "nota": (
+            "El modelo respondió como chatbot general diciendo que no tiene acceso a la "
+            "despensa del hogar, ignorando su rol de asistente de inventario de mostrador."
+        ),
+    },
+    {
+        "consulta": "¿Cuántas bandejas de huevos debo pedir para no quedarme sin stock?",
+        "f1": 0.16,
+        "correccion_factual": "no",
+        "completitud": "no",
+        "contradiccion": "no",
+        "nota": (
+            "Respuesta teórica sobre reposición y demanda sin entregar la cifra concreta "
+            "(tres bandejas) que el almacenero necesita saber de inmediato."
+        ),
+    },
+    {
+        "consulta": "¿Cuándo tengo que volver a comprar harina de kilo?",
+        "f1": 0.19,
+        "correccion_factual": "no",
+        "completitud": "no",
+        "contradiccion": "no",
+        "nota": (
+            "El modelo aconseja esperar a que se agote la reserva, lo cual contradice "
+            "la regla básica de stock mínimo de seguridad (reponer al llegar a cinco paquetes)."
+        ),
+    },
+    {
+        "consulta": "¿Qué hago con el papel de la guía de despacho que me firmó el chofer?",
+        "f1": 0.21,
+        "correccion_factual": "si",
+        "completitud": "si",
+        "contradiccion": "no",
+        "nota": (
+            "Factualmente correcto y útil, pero F1 fue bajo (0.21) porque usó términos formales "
+            "como 'recepción conforme' y 'gestionar la facturación' en vez de palabras cotidianas."
+        ),
+    },
+
+    # =========================================================================
+    # 5 CASOS CON F1 MÁS ALTO (Puntajes entre 0.48 y 0.58)
+    # =========================================================================
+    {
+        "consulta": "¿A qué número llamo para pedir más pan corriente si se acaba?",
+        "f1": 0.48,
+        "correccion_factual": "si",
+        "completitud": "si",
+        "contradiccion": "no",
+        "nota": (
+            "Buena orientación general indicando consultar a la panadería local, "
+            "compartiendo tokens clave con la referencia ('panadería', 'número', 'contacto')."
+        ),
+    },
+    {
+        "consulta": "¿Cuándo fue la última fecha que le compramos al proveedor de galletas?",
+        "f1": 0.50,
+        "correccion_factual": "no",
+        "completitud": "si",
+        "contradiccion": "si",
+        "nota": (
+            "F1 engañosamente alto: el modelo alucinó una fecha fija ('diez de octubre') "
+            "cuando la referencia era 'el martes pasado'. Tiene muchas palabras coincidentes pero el dato es inventado."
+        ),
+    },
+    {
+        "consulta": "¿Debo registrar las compras antes o después de colocar los productos en el estante?",
+        "f1": 0.56,
+        "correccion_factual": "si",
+        "completitud": "si",
+        "contradiccion": "no",
+        "nota": (
+            "Respuesta precisa y clara para el usuario mayor: confirma registrar antes "
+            "de ordenar, con alta coincidencia léxica con la referencia."
+        ),
+    },
+    {
+        "consulta": "¿Cuál es el monto mínimo de compra que exige el proveedor de cecinas?",
+        "f1": 0.58,
+        "correccion_factual": "no",
+        "completitud": "si",
+        "contradiccion": "si",
+        "nota": (
+            "F1 alto (0.58) pero dato erróneo: el modelo respondió cincuenta mil pesos "
+            "en lugar de veinticinco mil. Buen ejemplo donde la métrica léxica no detecta el error en la cifra."
+        ),
+    },
+    {
+        "consulta": "¿Para qué fecha está programada la entrega de las bebidas?",
+        "f1": 0.58,
+        "correccion_factual": "no",
+        "completitud": "si",
+        "contradiccion": "si",
+        "nota": (
+            "F1 alto por coincidencia de estructura ('entrega de las bebidas está programada...'), "
+            "pero inventó una fecha calendario ('quince de noviembre') en vez de 'este viernes temprano'."
+        ),
+    },
+]
+
+if __name__ == "__main__":
+    with open("revision_manual.json", "w", encoding="utf-8") as archivo:
+        json.dump(revision_manual, archivo, indent=2, ensure_ascii=False)
+    print("Archivo revision_manual.json generado exitosamente con los 10 casos.")
