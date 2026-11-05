@@ -1,12 +1,26 @@
-from dotenv import load_dotenv
-from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_core.prompts import PromptTemplate
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.runnables import (RunnableBranch, RunnablePassthrough) #bifurcaciones/branches/ramificaciones -> clase de lang.chain
+from dotenv import load_dotenv #Carga variables de entorno ocultas desde archivo .env
+from langchain_google_genai import ChatGoogleGenerativeAI #Conector LangChain para modelos de gemini
+from langchain_core.prompts import PromptTemplate #Permite crear textos dinámicos entre llaves {mensaje}
+from langchain_core.output_parsers import StrOutputParser #extrae texto plano de la respuesta
+from langchain_core.runnables import (RunnableBranch, RunnablePassthrough, RunnableLambda) #bifurcaciones/branches/ramificaciones -> clase de lang.chain
+
+import logging #generar un archivo log con los errores que se presenten
+
+logging.basicConfig(
+    level=logging.WARNING,
+    format='%(asctime)s [%(levelname)s] %(name)s: %(message)s', #2026-11-04 16:40 [WARNING] main: no se pudo ejecutar x
+    datefmt="%Y-%m-%d %H:%M:%S",
+    filename='error.log',
+    filemode='a', #agrega al final del archivo la nueva línea sin eliminar los anteriores registrados
+    encoding='utf-8',
+    force=True
+)
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
 modelo = ChatGoogleGenerativeAI(model='gemini-3.1-flash-lite')
+
 
 plantilla_clasificacion = PromptTemplate.from_template(
     'Clasifica el siguiente mensaje de soporte en una sola palabra:'
@@ -56,20 +70,34 @@ cadena_sugerencia = (
 
 #x= {'clasificacion': 'queja', 'mensaje': 'Mi teléfono no funciona'}
 bifurcacion = RunnableBranch(
-    (lambda x: x ['clasificacion'] == 'queja', cadena_queja),
+    (lambda x: x['clasificacion'] == 'queja', cadena_queja),
     (lambda x: x['clasificacion'] == 'sugerencia', cadena_sugerencia),
     cadena_pregunta
 )
 
-
-#ejecutar paso_clasificacion, obtener la respuesta como clasificacion y también conservar el mensaje original
 cadena_con_enrutamiento = (
-    RunnablePassthrough.assign(clasificacion=paso_clasificación) #
+    RunnablePassthrough.assign(clasificacion=paso_clasificación)
     | bifurcacion
 )
 
-resultado = cadena_con_enrutamiento.invoke(
-    {'mensaje': 'Deberían tener más agentes disponibles'}
+#fallback: cadena de respaldo. Caputa las caídas de mi LLm (RateLimitError, 401, APIConenectionError, respuestas vacías
+def fallback_con_log(x):
+    logger.warning("Cadena principal falló. Activando respuesta genérica, Error: %s", x.get("error"))
+    return "Gracias por tu mensaje. Un miembro de nuestro equipo te va a responder pronto."
+ 
+respuesta_generica = RunnableLambda(
+    fallback_con_log
 )
 
-print(resultado)
+cadena_robusta = cadena_con_enrutamiento.with_fallbacks([respuesta_generica], exception_key='error')
+
+def procesar_mensaje_seguro(cadena, mensaje):
+    try:
+        return cadena.invoke({"mensaje": mensaje})
+    except Exception as error:
+        logger.error("Error procesando mensaje: %s", error)
+        return "No pudimos procesar tu mensaje en este momento. Intenta de nuevo más tarde"
+
+if __name__ == "__main__": #Solamente ejecuta el siguiente bloque de código si la ejecución es directa del archivo. NO EJECUTES si es import
+    mensaje = "Llevo varios días sin poder entrar a mi cuenta."
+    print(procesar_mensaje_seguro(cadena_robusta, mensaje))
