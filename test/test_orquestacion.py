@@ -17,7 +17,7 @@ def test_cadena_alerta_usa_fallback_ante_fallo_del_modelo():
     # 2. Ejecutamos la cadena
     resultado = cadena_segura.invoke({"mensaje": "se rompió una caja"})
 
-    # 3. Comprobamos que respondió el mensaje de salvavidas amigable
+    # 3. Comprobamos que respondió el mensaje
     assert "disculpa" in resultado.lower() or "equipo" in resultado.lower()
 
 def test_procesar_mensaje_seguro_no_propaga_excepciones():
