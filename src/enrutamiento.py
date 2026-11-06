@@ -22,9 +22,10 @@ load_dotenv()
 modelo = ChatGoogleGenerativeAI(model='gemini-3.1-flash-lite')
 
 
+# Clasificador: detecta qué quiere hacer el almacenero con su mensaje de voz o texto
 plantilla_clasificacion = PromptTemplate.from_template(
-    'Clasifica el siguiente mensaje de soporte en una sola palabra:'
-    'pregunta, queja o sugerencia. Responde solo con esa palabra. \n\n {mensaje}'
+    'Clasifica el siguiente mensaje de voz de un almacenero en una sola palabra: '
+    'movimiento, consulta o alerta. Responde solo con esa palabra.\n\n{mensaje}'
 )
 
 paso_clasificación = (
@@ -34,7 +35,7 @@ paso_clasificación = (
     | (lambda texto: texto.strip().lower())
 )
 
-""" mensaje_prueba = 'mi telefono no está funcionando'
+""" mensaje_prueba = 'llegaron 5 paquetes de fideos'
 
 clasificacion = paso_clasificación.invoke(
     {'mensaje': mensaje_prueba}
@@ -42,20 +43,29 @@ clasificacion = paso_clasificación.invoke(
 
 print(clasificacion) """
 
-cadena_pregunta = (
-    PromptTemplate.from_template('Responde esta pregunta técnica con precisión: \n\n {mensaje}')
+# Camino 1: Consultas de inventario (cuánto queda, precios, ubicación)
+cadena_consulta = (
+    PromptTemplate.from_template(
+        'Eres el asistente de un negocio de barrio. Responde claro, breve y amigable a esta consulta de inventario:\n\n{mensaje}'
+    )
     | modelo
     | StrOutputParser()
 )
 
-cadena_queja = (
-    PromptTemplate.from_template('Responde esta queja con empatía reconociendo el problema antes de ofrecer una solución: \n\n {mensaje}')
+# Camino 2: Alertas e incidencias (productos vencidos, quejas de proveedores, faltantes)
+cadena_alerta = (
+    PromptTemplate.from_template(
+        'Eres un asistente de negocio. Registra esta alerta o problema con calma, resumiendo el problema para resolverlo:\n\n{mensaje}'
+    )
     | modelo
     | StrOutputParser()
 )
 
-cadena_sugerencia = (
-    PromptTemplate.from_template('Agradece esta sugerencia y explica como se evaluará dentro del producto: \n\n {mensaje}')
+# Camino 3: Movimiento de stock (entradas o salidas de mercadería)
+cadena_movimiento = (
+    PromptTemplate.from_template(
+        'Identifica el producto y la cantidad que entra o sale de bodega en este mensaje, confirmando el registro de forma muy sencilla:\n\n{mensaje}'
+    )
     | modelo
     | StrOutputParser()
 )
@@ -67,12 +77,11 @@ cadena_sugerencia = (
     rama_por_defecto
 ) """
 
-
-#x= {'clasificacion': 'queja', 'mensaje': 'Mi teléfono no funciona'}
+# Enrutador: si avisa un problema va a alerta, si avisa mercadería va a movimiento, si pregunta va a consulta
 bifurcacion = RunnableBranch(
-    (lambda x: x['clasificacion'] == 'queja', cadena_queja),
-    (lambda x: x['clasificacion'] == 'sugerencia', cadena_sugerencia),
-    cadena_pregunta
+    (lambda x: x['clasificacion'] == 'alerta', cadena_alerta),
+    (lambda x: x['clasificacion'] == 'movimiento', cadena_movimiento),
+    cadena_consulta
 )
 
 cadena_con_enrutamiento = (
@@ -80,11 +89,11 @@ cadena_con_enrutamiento = (
     | bifurcacion
 )
 
-#fallback: cadena de respaldo. Caputa las caídas de mi LLm (RateLimitError, 401, APIConenectionError, respuestas vacías
+#fallback: cadena de respaldo. Captura las caídas de mi LLm (RateLimitError, 401, APIConenectionError, respuestas vacías
 def fallback_con_log(x):
     logger.warning("Cadena principal falló. Activando respuesta genérica, Error: %s", x.get("error"))
-    return "Gracias por tu mensaje. Un miembro de nuestro equipo te va a responder pronto."
- 
+    return "Disculpa, no entendí bien el mensaje. Por favor repítemelo o anótalo directamente en la lista."
+
 respuesta_generica = RunnableLambda(
     fallback_con_log
 )
@@ -96,8 +105,20 @@ def procesar_mensaje_seguro(cadena, mensaje):
         return cadena.invoke({"mensaje": mensaje})
     except Exception as error:
         logger.error("Error procesando mensaje: %s", error)
-        return "No pudimos procesar tu mensaje en este momento. Intenta de nuevo más tarde"
+        return "Tuvimos un problema técnico momentáneo. Intenta de nuevo en unos segundos."
+
+
+def construir_cadena_alerta_segura(cadena):
+    """Protege la rama de alertas con un salvavidas si falla el modelo."""
+    return cadena.with_fallbacks([respuesta_generica])
+
+def construir_cadena_con_enrutamiento(paso_clasificacion=paso_clasificación):
+    """Permite armar la cadena inyectando una clasificación normal o de prueba."""
+    return (
+        RunnablePassthrough.assign(clasificacion=paso_clasificacion)
+        | bifurcacion
+    )
 
 if __name__ == "__main__": #Solamente ejecuta el siguiente bloque de código si la ejecución es directa del archivo. NO EJECUTES si es import
-    mensaje = "Llevo varios días sin poder entrar a mi cuenta."
+    mensaje = "Anota que me llegaron 12 tarros de café y se me rompió una bolsa de arroz."
     print(procesar_mensaje_seguro(cadena_robusta, mensaje))
