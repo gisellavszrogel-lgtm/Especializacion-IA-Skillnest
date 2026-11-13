@@ -1,5 +1,3 @@
-#Herramientas Personalizadas
-#Intro a Memoria
 from dotenv import load_dotenv
 from langchain_core.tools import tool
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
@@ -9,9 +7,9 @@ from langchain_classic.agents import (
     AgentExecutor,
     create_tool_calling_agent,
 )
-from pydantic import BaseModel, Field, ValidationError
-from langchain_core.chat_history import InMemoryChatMessageHistory #Crear el historial en base a la sesión
-from langchain_core.runnables.history import RunnableWithMessageHistory #Encapsular mi agente para que implemente la memoria
+from pydantic import BaseModel, Field
+from langchain_core.chat_history import InMemoryChatMessageHistory
+from langchain_core.runnables.history import RunnableWithMessageHistory
 
 import queue
 import threading
@@ -21,20 +19,10 @@ import json
 
 #=== Configuraciones e Inicializaciones===
 load_dotenv()
-modelo = ChatGoogleGenerativeAI(model="gemini-3.6-flash")
+modelo = ChatGoogleGenerativeAI(model="gemini-3.1-flash-lite")
 
 #=== Persistencia y Análisis de Trazabilidad ===
 def registrar_traza(session_id: str, entrada: str, resultado: dict) -> None:
-    """resultado = {"intermediate_steps": [
-        {
-        "AgentAction": {
-                "tool": x,
-                "tool_input": argumentos   
-            },
-        "str_observation": respuesta de la herramienta
-        },
-    ]}
-    """
     registro = {
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "session_id": session_id,
@@ -63,7 +51,7 @@ def esperar_aprobacion(mensaje: str, tiempo_limite_segundos: int = 15) -> bool:
         try:
             texto = input(mensaje)
             cola_respuesta.put(texto.strip().lower())
-        except(EOFError, KeyboardInterrupt):
+        except (EOFError, KeyboardInterrupt):
             cola_respuesta.put("")
     
     hilo = threading.Thread(target=pedir_entrada, daemon=True)
@@ -81,120 +69,72 @@ def registrar_aprobacion(herramienta: str, argumentos: dict, aprobado: bool) -> 
         "herramienta": herramienta,
         "argumentos": argumentos,
         "aprobado": aprobado,
-        "fecha_hora": datetime.now().isoformat() #2026-11-10T15:56:10
+        "fecha_hora": datetime.now().isoformat()
     })
 
-
 #=== Esquemas de Validación ===
-class ArgumentosConsultaEnvio(BaseModel): #class ClaseHija(ClasePadre):
-    """
-    Esquema para documentar y validar argumentos campo por campo ante el LLM.
-    """
-    numero_seguimiento: str = Field(
-        description="Número de seguimiento del envío, por ejemplo 'AR129012'."
-    )
-    incluir_historial: bool = Field(
-        default= False,
-        description="Si es True, incluye en historial completo de los estados, no solo el actual."
+class ArgumentosConsultaStock(BaseModel):
+    """Esquema para validar argumentos de consulta de inventario ante el LLM."""
+    producto: str = Field(
+        description="Nombre del producto a consultar, por ejemplo 'cafe' o 'arroz'."
     )
 
-#=== Base de Datos ===
-ESTADOS = {
-    "AR12345": {
-        "actual": "En tránsito, entrega estimada de 2 días",
-        "historial": [
-            "Recibido en depósito",
-            "En tránsito"
-        ]
-    },
-    "AR12346": {
-        "actual": "Entregado",
-        "historial": [
-            "Recibido en depósito",
-            "En tránsito"
-        ]
-    }
+#=== Base de Datos Local ===
+INVENTARIO = {
+    "cafe": {"nombre": "Café Nescafé 170g", "stock": 10, "precio": 4500},
+    "arroz": {"nombre": "Arroz Grado 1 1kg", "stock": 40, "precio": 1500}
 }
 
 #=== Herramientas ===
-#@tool("nuevo_nombre")
-@tool(args_schema=ArgumentosConsultaEnvio) #LangChain transforma esta clase en un esquema JSON que se envía al LLM. El modelo lo lee textualmente
-def consultar_estado_envio_detallado(numero_seguimiento: str, incluir_historial: bool = False):
-    """
-    Consulta el estado de un envío, con la opción de incluir el historial completo.
-    """
-    envio = ESTADOS.get(numero_seguimiento) #AR12346
-    #envio = {
-    #     "actual": "Entregado",
-    #     "historial": [
-    #         "Recibido en depósito",
-    #         "En tránsito"
-    #     ]
-    # }
-    if envio is None:
-        return f"No se encontró un envío con el número {numero_seguimiento}."
-    
-    #Si no se solicita el historial, retornamos solo el estado actual
-    if not incluir_historial:
-        return envio["actual"]
-
-    #Si sí se solicita el historial, formatear y retornar la info
-    historial = ", ".join(envio["historial"]) # "Recibido en depósito, En tránsito"
-    return f"{envio['actual']} (historial: {historial})" #"Entregado" (historial: Recibido en depósito, En tránsito)
+@tool(args_schema=ArgumentosConsultaStock)
+def consultar_stock_producto(producto: str) -> str:
+    """Consulta el stock y precio actual de un producto en el inventario (Riesgo bajo: solo lectura)."""
+    item = INVENTARIO.get(producto.lower())
+    if item is None:
+        return f"No se encontró el producto '{producto}' en el inventario."
+    return f"{item['nombre']}: {item['stock']} unidades disponibles (Precio: ${item['precio']})."
 
 @tool
-def calcular_costo_envio(peso_kg: float, distancia_km: float) -> str:
-    """Calcula el costo estimado de un envío según su peso y la distancia a recorrer.
-    Usar cuando el usuario pregunta cuánto va a costar enviar algo."""
-    costo = 500 + (peso_kg * 120) + (distancia_km * 3)
-    return f"El costo estimado es de ${costo:.2f}"
+def calcular_valor_venta(cantidad: int, precio_unitario: float) -> str:
+    """Calcula el total a cobrar por una venta según cantidad y precio unitario (Riesgo bajo: cálculo)."""
+    total = cantidad * precio_unitario
+    return f"El valor total es de ${total:.2f}"
 
 @tool
-def generar_reembolso(numero_pedido: str, monto: float) -> str:
-    """
-    Generar un reembolso económico para un pedido. Acción irreversible: requiere aprobación humana antes de ejecutarse.
-    """
-    mensaje = f"[SUPERVISIÓN HUMARA REQUERIDA] El usuario solicita reembolsar ${monto} para el pedido {numero_pedido}. ¿Desea aprobar? (s/n): "
+def descontar_stock_venta(producto: str, cantidad: int) -> str:
+    """Descuenta unidades del inventario por una venta. Acción con impacto en stock: requiere aprobación humana."""
+    clave = producto.lower()
+    if clave not in INVENTARIO:
+        return f"No existe el producto '{producto}'."
 
-    #Congelar el proceso, hasta que el supervisor de el visto bueno
+    mensaje = f"[SUPERVISIÓN HUMANA REQUERIDA] Se descontarán {cantidad} unidades de '{producto}'. ¿Desea aprobar? (s/n): "
     aprobado = esperar_aprobacion(mensaje, tiempo_limite_segundos=15)
 
-    #Registrar en la lista si se aprobó o rechazó el reembolso
     registrar_aprobacion(
-        herramienta="generar_reembolso",
-        argumentos={"numero_pedido": numero_pedido, "monto": monto},
+        herramienta="descontar_stock_venta",
+        argumentos={"producto": producto, "cantidad": cantidad},
         aprobado=aprobado
     )
 
     if not aprobado:
-        return "Reembolso no aprobado por el supervisor o cancelado por timeout"
+        return "Descuento de stock no aprobado por el supervisor o cancelado por timeout."
     
-    #Acciones para regresar el dinero (Ej: llamada a la pasarela de pago)
-    return f"Reembolso de {monto} fue generado con éxito para el pedido {numero_pedido}"
+    INVENTARIO[clave]["stock"] -= cantidad
+    return f"Stock actualizado con éxito. Quedan {INVENTARIO[clave]['stock']} unidades de {INVENTARIO[clave]['nombre']}."
 
-#Listado de herramientas
-herramientas = [consultar_estado_envio_detallado, calcular_costo_envio, generar_reembolso]
+herramientas = [consultar_stock_producto, calcular_valor_venta, descontar_stock_venta]
 
 #=== Gestión de historial en memoria ===
 historiales = {}
-"""
-historiales = {
-    'cliente_123': {MENSAJES},
-    'cliente_345': {MENSAJES},
-    'cliente_567': {"Cuánto me cuesta x y y?"}
-}
-"""
-def obtener_historial(session_id: str): #cliente_567
+
+def obtener_historial(session_id: str):
     if session_id not in historiales:
         historiales[session_id] = InMemoryChatMessageHistory()
     return historiales[session_id]
 
-
 #=== Construcción del agente ===
 prompt_agente = ChatPromptTemplate.from_messages([
-    (
-        "system", "Eres un asistente de logística que responde preguntas usando las herramientas disponibles."
-    ),
+    ("system", "Eres un asistente de inventario que responde consultas y registra ventas usando las herramientas disponibles."),
     MessagesPlaceholder("chat_history"),
     ("human", "{entrada}"),
     MessagesPlaceholder("agent_scratchpad")
@@ -209,14 +149,12 @@ ejecutor_agente = AgentExecutor(
     return_intermediate_steps=True
 )
 
-#**kwargs
 limpiar_salida = RunnableLambda(
     lambda d: {**d, "output": d["output"][0]["text"] if isinstance(d.get("output"), list) else d.get("output")}
 )
 
 cadena_agente = ejecutor_agente | limpiar_salida
 
-#agente con memoria
 agente_con_memoria = RunnableWithMessageHistory(
     cadena_agente,
     obtener_historial,
@@ -227,61 +165,15 @@ agente_con_memoria = RunnableWithMessageHistory(
 
 #=== Ejecución ===
 if __name__ == "__main__":
-    # resultado = ejecutor_agente.invoke(
-    #     {"entrada": "¿Cuál es el estado del envío AR12345, con su historial?"}
-    # )
+    # 1. Prueba de riesgo bajo (Solo lectura)
+    config1 = {"configurable": {"session_id": "tienda_01"}}
+    entrada1 = "¿Cuánto stock de cafe queda?"
+    resultado1 = agente_con_memoria.invoke({"entrada": entrada1}, config1)
+    print(resultado1["output"])
+    registrar_traza(session_id="tienda_01", entrada=entrada1, resultado=resultado1)
 
-    #print("Respuesta: ", resultado["output"][0]["text"])
-    
-    # config1 = {"configurable": {"session_id": "cliente_456"}}
-    # resultado1 = agente_con_memoria.invoke(
-    #     {"entrada": "¿Cuál es el estado del envío AR12345, con su historial?"},
-    #     config1
-    # )
-
-    # print("Turno 1: ", resultado1["output"])
-
-    # resultado2 = agente_con_memoria.invoke(
-    #     {"entrada": "¿Y ese mismo envío ya fue entregado?"},
-    #     config1
-    # )
-
-    # print("Turno 2: ", resultado2["output"])
-
-    # config2 = {"configurable": {"session_id": "cliente_567"}}
-    # resultado3 = agente_con_memoria.invoke(
-    #     {"entrada": "¿Cuánto cuesta enviar un paquete de 3kg a 300km"},
-    #     config2
-    # )
-
-    # print("Turno 3:", resultado3['output'])
-
-    # resultado4 = agente_con_memoria.invoke(
-    #     {"entrada": "¿Y cuánto costaría con el doble de peso?"},
-    #     config2
-    # )
-
-    # print("Turno 4:", resultado4['output'])
-
-    # config_reembolso = {"configurable": {"session_id": "cliente_123"}}
-    # resultado_reembolso = agente_con_memoria.invoke(
-    #     {"entrada": "Mi pedido PED123 llegó roto. Exijo un reembolso de mis 25000 pesos."},
-    #     config_reembolso
-    # )
-
-    # print("Resultado: ", resultado_reembolso)
-
-    # print("Registros de reembolsos:")
-    # for registro in registro_aprobaciones:
-    #     print(registro)
-
-    config_costo = {"configurable": {"session_id": "cliente_246"}}
-    entrada = "¿Cuánto me cuesta enviar un paquete de 2.5kg a 50km?"
-    resultado_costo = agente_con_memoria.invoke(
-        {"entrada": entrada},
-        config_costo
-    )
-
-    print(resultado_costo["output"])
-
-    registrar_traza(session_id=config_costo["configurable"]["session_id"], entrada=entrada, resultado=resultado_costo)
+    # 2. Prueba de riesgo alto (Modifica stock y pide aprobación 's')
+    entrada2 = "Vendí 3 unidades de cafe, descuéntalas del inventario."
+    resultado2 = agente_con_memoria.invoke({"entrada": entrada2}, config1)
+    print(resultado2["output"])
+    registrar_traza(session_id="tienda_01", entrada=entrada2, resultado=resultado2)
