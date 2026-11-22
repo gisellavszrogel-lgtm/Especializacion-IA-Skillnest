@@ -10,9 +10,8 @@ from rag_indexer import cargar_vectorstore, formatear_contexto
 load_dotenv()
 
 #Plantilla que me obligue a usar SOLO el contexto recuperado y también a citar [1], [2]
-PROMPT_TEMPLATE = """Responde la pregunta usando SOLO el contexto de abajo. Cita la \
-fuente de cada afirmacion con su numero entre corchetes, como [1]. Si el contexto no \
-alcanza para responder, dilo explicitamente en vez de inventar.
+PROMPT_TEMPLATE = """Eres el asistente de una despensa inteligente. Responde usando SOLO el contexto de abajo.
+Cita cada afirmación con su número entre corchetes, como [1]. Si el contexto no alcanza, dilo explícitamente sin inventar.
 
 Contexto:
 {contexto}
@@ -123,11 +122,11 @@ def guardar_registro_jsonl(registro: dict, ruta_archivo: str = "registro_latenci
     print(f"Registro guardado en {ruta_archivo}")
 
 if __name__ == "__main__":
-    CARPETA_DB = "vectorstore_ejemplo"
+    CARPETA_DB = "vectorstore"
     K = 3
     vs = cargar_vectorstore(CARPETA_DB)
 
-    pregunta = "¿Cuántos intentos hace el cliente ante un TimeoutError y cuánto espera entre cada uno?"
+    pregunta = "¿Qué reemplazos puedo usar si me falta leche o huevos en los panqueques?"
 
     # tiempos = {}
     # with medir(tiempos, "embed_y_busqueda"):

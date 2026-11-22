@@ -1,0 +1,44 @@
+# Inventario Actual de Despensa
+
+## Refrigerador y Frescos
+- **Huevos:** 4 unidades (vencen en 3 días - Prioridad Alta).
+- **Leche entera:** 500 ml abiertos (vence en 2 días - Prioridad Alta).
+- **Pollo (pechuga):** 400 g (vence mañana - Prioridad Crítica).
+- **Espinacas frescas:** 1 bolsa de 200 g (vence en 2 días).
+- **Queso mantecoso:** 150 g laminado.
+- **Zanahorias:** 3 unidades medianas.
+
+## Alacena y Secos
+- **Arroz blanco:** 1 kg.
+- **Fideos espirales:** 500 g.
+- **Lentejas:** 400 g.
+- **Atún en lata:** 2 latas al agua.
+- **Avena en hojuelas:** 500 g.
+- **Harina de trigo:** 1 kg.
+- **Aceite de oliva, sal, pimienta, ajo en polvo y orégano.**
+
+---
+
+# Recetario de Aprovechamiento (Despensa Inteligente)
+
+## 1. Salteado Rápido de Pollo y Espinacas con Arroz
+- **Tiempo de preparación:** 20 minutos.
+- **Ingredientes:** 400 g de pechuga de pollo, 200 g de espinacas frescas, 1 taza de arroz blanco, ajo en polvo, aceite de oliva y sal.
+- **Preparación:** Cocinar el arroz. Cortar el pollo en cubos y dorar en sartén con aceite de oliva y ajo. Agregar las espinacas al final por 2 minutos hasta que reduzcan su volumen. Servir acompañado del arroz.
+- **Nota de despensa:** Ideal para consumir ingredientes de prioridad crítica antes de su vencimiento.
+
+## 2. Tortilla Express de Atún y Zanahoria
+- **Tiempo de preparación:** 15 minutos.
+- **Ingredientes:** 3 huevos, 1 lata de atún al agua, 1 zanahoria rallada, sal y orégano.
+- **Preparación:** Batir los huevos con sal y orégano. Incorporar el atún escurrido y la zanahoria rallada. Cocinar en sartén antiadherente a fuego medio por 5 minutos por lado.
+
+## 3. Panqueques de Avena (Sin Harina Refinada)
+- **Tiempo de preparación:** 15 minutos.
+- **Ingredientes:** 1 taza de avena en hojuelas, 1 huevo, 150 ml de leche entera, pizca de sal.
+- **Preparación:** Licuar todos los ingredientes hasta obtener una mezcla homogénea. Cocinar porciones pequeñas en sartén caliente por 2 minutos por lado.
+- **Sustituciones permitidas:** Si no hay leche entera, se puede reemplazar por 150 ml de agua o bebida vegetal. Si falta huevo, usar 1 cucharada de chía hidratada en 3 cucharadas de agua.
+
+## 4. Guiso Express de Lentejas y Zanahoria
+- **Tiempo de preparación:** 30 minutos.
+- **Ingredientes:** 200 g de lentejas, 2 zanahorias picadas en cubos, 1 taza de arroz blanco, ajo en polvo, aceite de oliva y sal.
+- **Preparación:** Cocinar las lentejas en agua hirviendo con las zanahorias durante 20 minutos. Agregar el arroz y cocinar 10 minutos más hasta que ambos estén blandos. Condimentar con aceite de oliva y ajo.

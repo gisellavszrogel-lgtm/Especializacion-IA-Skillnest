@@ -134,7 +134,7 @@ def formatear_contexto(chunks_recuperados):
         {
             "page_content": "El usuario puede iniciar 3 veces sesión",
             "metadata": {
-                "fuente": "manual_de_usuario.txt",
+                "fuente": "registro_despensa.txt",
                 "fecha": "2026-11-13"
             }
         },
@@ -178,7 +178,7 @@ def inspeccionar_chunks(vectorstore):
 
 if __name__ == "__main__":
     #Constante
-    CARPETA_DB = "vectorstore_ejemplo"
+    CARPETA_DB = "vectorstore"
 
     # corpus = [
     #     "El cliente reintenta hasta 3 veces ante un TimeoutError, con espera creciente.",
@@ -225,10 +225,10 @@ if __name__ == "__main__":
     #     print(r.page_content)
 
     #Instalación adicional si queremos leer pdf, docs, etc
-    with open("manual_de_usuario.txt", "r", encoding="utf-8") as f: #r: read, a: append, w: write
+    with open("registro_despensa.txt", "r", encoding="utf-8") as f: #r: read, a: append, w: write
         contenido = f.read()
 
-    documentos = [Document(page_content=contenido, metadata={"fuente": "manual_de_usuario.txt", "fecha": "2026-11-13"})]
+    documentos = [Document(page_content=contenido, metadata={"fuente": "registro_despensa.txt", "fecha": "2026-11-13"})]
 
     #indexar_corpus(documentos, CARPETA_DB, es_documento=True) #comentado para que no vuelvan a ingresar el manual de usuario en su vs
 
