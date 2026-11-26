@@ -20,7 +20,6 @@ def recomendar_estrategia(respuestas):
     return puntos, ganadoras
 
 
-# Ajusta cada True/False a tu evidencia real antes de correr:
 respuestas_mi_caso = {
     "informacion_cambia_seguido": False,
     "problema_de_formato_o_tono": True,
